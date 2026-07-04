@@ -39,7 +39,6 @@ def yoxla():
             res_alis = requests.post(url, json=data_alis, headers=headers, timeout=10).json()
             if res_alis.get("data"):
                 en_ucuz_alis = float(res_alis["data"][0]["adv"]["price"])
-                # Qiymət limiti 1.71 edildi
                 if en_ucuz_alis <= 1.71 and son_veziyyet != "ucuz":
                     mesaj_gonder(f"🚨 UCUZ USDT!\nQiymət: {en_ucuz_alis} AZN")
                     son_veziyyet = "ucuz"
@@ -47,13 +46,13 @@ def yoxla():
             res_satis = requests.post(url, json=data_satis, headers=headers, timeout=10).json()
             if res_satis.get("data"):
                 en_baha_satis = float(res_satis["data"][0]["adv"]["price"])
-                if en_baha_satis >= 2.00 and son_veziyyet != "baha":
+                # Satış limiti 1.75 olaraq dəyişdirildi
+                if en_baha_satis >= 1.75 and son_veziyyet != "baha":
                     mesaj_gonder(f"💰 USDT SATMAQ VAXTIDIR!\nQiymət: {en_baha_satis} AZN")
                     son_veziyyet = "baha"
             
             if 'en_ucuz_alis' in locals() and 'en_baha_satis' in locals():
-                # Normala qayıtma şərti də 1.71-ə uyğunlaşdırıldı
-                if en_ucuz_alis > 1.71 and en_baha_satis < 2.00:
+                if en_ucuz_alis > 1.71 and en_baha_satis < 1.75:
                     son_veziyyet = None
 
         except Exception as e:
