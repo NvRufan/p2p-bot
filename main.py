@@ -7,7 +7,6 @@ import requests
 TOKEN = "8979537285:AAEpvAXbMaw6cPHFm05TVEqafD5z6YIPgzU"
 CHAT_ID = "940235559"
 
-# Siqnalların təkrarlanmaması üçün vəziyyət yaddaşı
 son_veziyyet = None  
 
 def mesaj_gonder(metn):
@@ -37,40 +36,37 @@ def yoxla():
 
     while True:
         try:
-            # 1. Alış qiymətini yoxla
             res_alis = requests.post(url, json=data_alis, headers=headers, timeout=10).json()
             if res_alis.get("data"):
                 en_ucuz_alis = float(res_alis["data"][0]["adv"]["price"])
-                
-                if en_ucuz_alis <= 1.72 and son_veziyyet != "ucuz":
+                # Qiymət limiti 1.71 edildi
+                if en_ucuz_alis <= 1.71 and son_veziyyet != "ucuz":
                     mesaj_gonder(f"🚨 UCUZ USDT!\nQiymət: {en_ucuz_alis} AZN")
                     son_veziyyet = "ucuz"
                     
-            # 2. Satış qiymətini yoxla
             res_satis = requests.post(url, json=data_satis, headers=headers, timeout=10).json()
             if res_satis.get("data"):
                 en_baha_satis = float(res_satis["data"][0]["adv"]["price"])
-                
                 if en_baha_satis >= 2.00 and son_veziyyet != "baha":
                     mesaj_gonder(f"💰 USDT SATMAQ VAXTIDIR!\nQiymət: {en_baha_satis} AZN")
                     son_veziyyet = "baha"
             
-            # Qiymətlər normala qayıdanda yaddaşı sıfırla
             if 'en_ucuz_alis' in locals() and 'en_baha_satis' in locals():
-                if en_ucuz_alis > 1.72 and en_baha_satis < 2.00:
+                # Normala qayıtma şərti də 1.71-ə uyğunlaşdırıldı
+                if en_ucuz_alis > 1.71 and en_baha_satis < 2.00:
                     son_veziyyet = None
 
         except Exception as e:
-            print("P2P yoxlama xətası:", e)
+            print("P2P xətası:", e)
             
-        time.sleep(15)  # Hər 15 saniyədən bir yoxlayır
+        time.sleep(15)
 
 class HealthCheckHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
         self.send_header("Content-type", "text/plain")
         self.end_headers()
-        self.wfile.write(b"Bot is alive!")
+        self.wfile.write(b"Live")
 
 def run_server():
     server = HTTPServer(("0.0.0.0", 10000), HealthCheckHandler)
@@ -80,5 +76,4 @@ if __name__ == "__main__":
     t = threading.Thread(target=yoxla)
     t.daemon = True
     t.start()
-    
     run_server()
