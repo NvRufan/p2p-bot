@@ -4,7 +4,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import threading
 import requests
 
-TOKEN = "8979537285:AAEpvAXbMaw6cPHFm05TVEqafD5z6YIPgzU"
+TOKEN = "8979537285:AAEpvAXbMaw6cPHFmO5TVEqafD5z6YIPgzU"
 CHAT_ID = "940235559"
 
 def mesaj_gonder(metn):
